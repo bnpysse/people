@@ -11,7 +11,7 @@ login_cookies_dict = {
     '_ga': 'GA1.2.576373095.1589077068',
     # 'targetEncodinghttp://127001': '2',
     # 需要改的就是这个东西
-    'ezproxy': 'SSBCrTW1VMmSOTd',
+    'ezproxy': 'X62pZXETTLJvhvK',
 }
 
 login_url = 'http://data.people.com.cn.proxy.library.georgetown.edu/rmrb/20200515/1?code=2'
@@ -37,7 +37,7 @@ url = 'http://data.people.com.cn.proxy.library.georgetown.edu/rmrb/s?qs=%7B%22cd
 
 # 每页的链接是动态生成的，只能通过计算来获得总页数，在查询出来的页面中是不含总页数的，只有allDataCount这个总的记录条数
 # 2020-05-17 01:44:08
-def getPeriod(start_date, end_date, pageNo=1):
+def getPeriod(start_date, end_date, pageNo):
     # start_date:起始日期
     # end_date:终止日期,格式必须是 YYYYMMDD
     resp = login_s.get(url.format(start_date, end_date, pageNo, pageSize), headers=login_headers, cookies=cookies)
@@ -77,7 +77,8 @@ def parseSearch(html):
 # 按月份建立数据库，取得某个月的起始日期，然后写到以月份命名的sqlite库中
 def writeMonth(month):
     start_date, end_date = get_month_begin_end_day(month)
-    html, totalPageNum = getPeriod(start_date, end_date)
+    html, totalPageNum = getPeriod(start_date, end_date, 1)
+    print('totalPageNum:{}'.format(totalPageNum))
     for i in range(2, totalPageNum + 1):
         searchDict = parseSearch(html)
         print('Processing..第{}页'.format(i - 1))
@@ -89,7 +90,7 @@ def writeMonth(month):
                     # w.writerow(searchDict[k]['Title'], searchDict[k]['Date'], searchDict[k]['Layout'],
                     #            searchDict[k]['Keywords'], searchDict[k]['Summary'], searchDict[k]['Link'])
                     w.writerow(searchDict[k].values())
-        html = getPeriod(start_date, end_date, pageNo=i)
+        html, total = getPeriod(start_date, end_date, i)
 
 
 # 获取某个月份的起止日期字符串
