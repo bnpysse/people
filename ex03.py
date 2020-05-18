@@ -11,7 +11,7 @@ login_cookies_dict = {
     '_ga': 'GA1.2.576373095.1589077068',
     # 'targetEncodinghttp://127001': '2',
     # 需要改的就是这个东西
-    'ezproxy': '3o4rHDkfe4H4tfN',
+    'ezproxy': 'SSBCrTW1VMmSOTd',
 }
 
 login_url = 'http://data.people.com.cn.proxy.library.georgetown.edu/rmrb/20200515/1?code=2'
@@ -75,13 +75,20 @@ def parseSearch(html):
 
 
 # 按月份建立数据库，取得某个月的起始日期，然后写到以月份命名的sqlite库中
-def WriteMonth(month):
+def writeMonth(month):
     start_date, end_date = get_month_begin_end_day(month)
     html, totalPageNum = getPeriod(start_date, end_date)
     for i in range(2, totalPageNum + 1):
         searchDict = parseSearch(html)
-        print('Processing..{}页'.format(i - 1))
-        # TODO 处理返回的字典
+        print('Processing..第{}页'.format(i - 1))
+        # 写入到 csv 文件中去，还是写入到sqlite数据库？2020-05-18 18:15:007
+        with open(month + '.csv', 'a+') as file:
+            w = csv.writer(file)
+            for k, v in enumerate(searchDict):
+                if 'Title' in searchDict[k].keys():
+                    # w.writerow(searchDict[k]['Title'], searchDict[k]['Date'], searchDict[k]['Layout'],
+                    #            searchDict[k]['Keywords'], searchDict[k]['Summary'], searchDict[k]['Link'])
+                    w.writerow(searchDict[k].values())
         html = getPeriod(start_date, end_date, pageNo=i)
 
 
@@ -106,10 +113,11 @@ def getDetail(link_dict):
 
 
 if __name__ == '__main__':
-    html, totalPageNum = getPeriod('2000-01-01', '2000-02-01', 68)
-    l = parseSearch(html)
-
-    for k, v in enumerate(l):
-        if 'Title' in l[k].keys():
-            print(k, ':', l[k]['Title'], ':', l[k]['Date'], ':第', l[k]['Layout'], '版', ':', l[k]['Keywords'],
-                  '\n\t', l[k]['Summary'], ':', l[k]['Link'])
+    # html, totalPageNum = getPeriod('2000-01-01', '2000-02-01', 68)
+    # l = parseSearch(html)
+    #
+    # for k, v in enumerate(l):
+    #     if 'Title' in l[k].keys():
+    #         print(k, ':', l[k]['Title'], ':', l[k]['Date'], ':第', l[k]['Layout'], '版', ':', l[k]['Keywords'],
+    #               '\n\t', l[k]['Summary'], ':', l[k]['Link'])
+    writeMonth('200001')
