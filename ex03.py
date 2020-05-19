@@ -12,7 +12,7 @@ login_cookies_dict = {
     '_ga': 'GA1.2.576373095.1589077068',
     # 'targetEncodinghttp://127001': '2',
     # 需要改的就是这个东西
-    'ezproxy': '5eYOUhBrJxbO3Eg',
+    'ezproxy': 'Uo0lkBc1cxJ530v',
 }
 
 login_url = 'http://data.people.com.cn.proxy.library.georgetown.edu/rmrb/20200515/1?code=2'
@@ -99,7 +99,8 @@ def writeMonth(month):
         cursor.execute('begin transaction')
         for k, v in enumerate(searchDict):
             if 'Title' in searchDict[k].keys():
-                cursor.execute(insert_sql.format(searchDict[k]['Title'], searchDict[k]['Date'], searchDict[k]['Layout'],
+                cursor.execute(insert_sql.format(month, searchDict[k]['Title'], searchDict[k]['Date'],
+                                                 searchDict[k]['Layout'],
                                                  searchDict[k]['Keywords'], searchDict[k]['Summary'],
                                                  searchDict[k]['Link']))
 
@@ -109,7 +110,7 @@ def writeMonth(month):
 
 # 创建一个空数据库
 def createSqlite(month):
-    sql = 'CREATE TABLE if not exists {} ( `id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, `Title` TEXT, `Link` TEXT, `Date` ' \
+    sql = 'CREATE TABLE if not exists `{}`( `id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, `Title` TEXT, `Link` TEXT, `Date` ' \
           'TEXT, `Layout` TEXT, `Keywords` TEXT, `Summary` TEXT )'
     # delete_sql = 'drop table {}'
     db_file_name = month[:4] + '.db'
