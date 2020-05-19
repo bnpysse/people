@@ -1,8 +1,9 @@
+import sqlite3
+
 import requests
 from pyquery import PyQuery as pq
 import os
 from datetime import datetime, timedelta
-import bs4
 import math
 import csv
 
@@ -11,7 +12,7 @@ login_cookies_dict = {
     '_ga': 'GA1.2.576373095.1589077068',
     # 'targetEncodinghttp://127001': '2',
     # 需要改的就是这个东西
-    'ezproxy': 'X62pZXETTLJvhvK',
+    'ezproxy': '5eYOUhBrJxbO3Eg',
 }
 
 login_url = 'http://data.people.com.cn.proxy.library.georgetown.edu/rmrb/20200515/1?code=2'
@@ -76,21 +77,49 @@ def parseSearch(html):
 
 # 按月份建立数据库，取得某个月的起始日期，然后写到以月份命名的sqlite库中
 def writeMonth(month):
+    insert_sql = 'insert into {}(`Title`, `Date`, `Layout`, `Keywords`, `Summary`, `Link`) values({},{},{},{},{},{})'
+    createSqlite(month)
+    conn = sqlite3.connect(month[:4] + '.db')
+    cursor = conn.cursor()
+
     start_date, end_date = get_month_begin_end_day(month)
     html, totalPageNum = getPeriod(start_date, end_date, 1)
     print('totalPageNum:{}'.format(totalPageNum))
-    for i in range(2, totalPageNum + 1):
+    for i in range(2, totalPageNum + 2):
         searchDict = parseSearch(html)
         print('Processing..第{}页'.format(i - 1))
         # 写入到 csv 文件中去，还是写入到sqlite数据库？2020-05-18 18:15:007
-        with open(month + '.csv', 'a+') as file:
-            w = csv.writer(file)
-            for k, v in enumerate(searchDict):
-                if 'Title' in searchDict[k].keys():
-                    # w.writerow(searchDict[k]['Title'], searchDict[k]['Date'], searchDict[k]['Layout'],
-                    #            searchDict[k]['Keywords'], searchDict[k]['Summary'], searchDict[k]['Link'])
-                    w.writerow(searchDict[k].values())
+        # with open(month + '.csv', 'a+') as file:
+        #     w = csv.writer(file)
+        #     for k, v in enumerate(searchDict):
+        #         if 'Title' in searchDict[k].keys():
+        #             # w.writerow(searchDict[k]['Title'], searchDict[k]['Date'], searchDict[k]['Layout'],
+        #             #            searchDict[k]['Keywords'], searchDict[k]['Summary'], searchDict[k]['Link'])
+        #             w.writerow(searchDict[k].values())
+        cursor.execute('begin transaction')
+        for k, v in enumerate(searchDict):
+            if 'Title' in searchDict[k].keys():
+                cursor.execute(insert_sql.format(searchDict[k]['Title'], searchDict[k]['Date'], searchDict[k]['Layout'],
+                                                 searchDict[k]['Keywords'], searchDict[k]['Summary'],
+                                                 searchDict[k]['Link']))
+
+        cursor.execute('commit')
         html, total = getPeriod(start_date, end_date, i)
+
+
+# 创建一个空数据库
+def createSqlite(month):
+    sql = 'CREATE TABLE if not exists {} ( `id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, `Title` TEXT, `Link` TEXT, `Date` ' \
+          'TEXT, `Layout` TEXT, `Keywords` TEXT, `Summary` TEXT )'
+    # delete_sql = 'drop table {}'
+    db_file_name = month[:4] + '.db'
+    if not os.path.exists(db_file_name):
+        conn = sqlite3.connect(db_file_name)
+        cur = conn.cursor()
+        cur.execute(sql.format(month))
+        cur.close()
+        conn.commit()
+        conn.close()
 
 
 # 获取某个月份的起止日期字符串
