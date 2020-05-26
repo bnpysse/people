@@ -39,23 +39,31 @@ def process_date(date_url, total, spec_date):
     return date_dict
 
 
-def getYear(year):
-    for m in range(1, 13):
-        start_month_time = datetime.now()
-        print('Processing..{}-{:02d}'.format(year, m), end=',')
-        getMonth('{}-{:02d}'.format(year, m))
-        print('用时 {:>2d}分{:>2d}秒'.format((datetime.now() - start_month_time).min,
-                                         (datetime.now() - start_month_time).seconds))
+def getYear(year, num=0):
+    def getOneYear(my_year):
+        for m in range(1, 13):
+            start_month_time = datetime.now()
+            print('Processing...{}年{:02d}月'.format(my_year, m))
+            date_sheets = getMonth('{}-{:02d}'.format(my_year, m))
+            minutes, secs = divmod((datetime.now() - start_month_time).seconds, 60)
+            print('{}年{:02d}月，{}篇文章，共计用时 {:2d}分{:>2d}秒'.format(my_year, m, date_sheets, minutes, secs))
 
-        # 处理某一个月
-        # month的格式为：YYYY-MM
+    if num > 0:
+        for y in range(int(year), int(year) + num + 1):
+            getOneYear(y)
+            print('-'*50)
+    else:
+        getOneYear(year)
 
 
+# 处理某一个月
+# month的格式为：YYYY-MM
 def getMonth(month):
     url = base_url + '/' + month
     index_html = str(requests.get(url, headers=headers).content, 'utf-8')
     doc = pq(index_html)
     month_dict = init_month_dict(month)
+    total_sheet = 0
     # 主要是要处理有的日期可能是 0 篇，那么这些日期就不会有链接
     for k, v in enumerate(doc('.c_m p').items()):
         # 这里面含有‘篇’字，需要将其去掉
@@ -76,12 +84,14 @@ def getMonth(month):
             # 处理某一天的情况
             print('\tProcessing...{}, {}篇'.format(v['Date'], v['Quantity']), end=',')
             start_time = datetime.now()
-
+            total_sheet += v['Quantity']
             date_dict = process_date(month_dict[k]['Link'], month_dict[k]['Quantity'], v['Date'])
+            # print('date_dict''s length is:{}'.format(len(date_dict)))
             # 将每一天的字典内容写入到数据库中就可以了。。。2020-05-26 06:52:01
-            for k, v in enumerate(date_dict):
-                writeMonth(date_dict, month)
-            print(' 用时{:>2d}秒'.format((datetime.now() - start_time).seconds))
+            # for k, v in enumerate(date_dict):
+            writeMonth(date_dict, month)
+            print(' 用时{:^4d}秒'.format((datetime.now() - start_time).seconds))
+    return total_sheet
 
 
 # 写入到sqlite表中
@@ -110,6 +120,7 @@ def getLayout(url):
     return url[url.rindex('-') + 1:url.rindex('#')]
 
 
+# 初始化月份索引字典列表
 def init_month_dict(month):
     y = int(month[:4])
     m = int(month[5:])
@@ -124,10 +135,6 @@ def init_month_dict(month):
 
 
 if __name__ == '__main__':
-    getMonth('1946-07')
-    getMonth('1946-08')
-    getMonth('1946-09')
-    getMonth('1946-10')
-    getMonth('1946-11')
-    getMonth('1946-12')
+    # getMonth('1946-07')
     # process_date(base_url + '/' + '1946-05-15', 38)
+    getYear('1947', 2)
