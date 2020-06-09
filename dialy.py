@@ -3,20 +3,20 @@
 # 即：在查询的结果中添加这样的参数 &position=XX ,代表了查询结果中第 0 篇到 PageSize-1的详情
 # 页面，这个结果还是相当不错的，所以把原来的程序改一下，应该就可以用了。
 
+import math
+import os
 import sqlite3
+from datetime import datetime, timedelta
+from pyppeteer import launch
 import requests
 from pyquery import PyQuery as pq
-import os
-from datetime import datetime, timedelta
-import math
-import csv
 
 login_cookies_dict = {
     # 'JSESSIONID': 'E1CBA10B637794FA770DC61CB0DCE91A',
     '_ga': 'GA1.2.576373095.1589077068',
     # 'targetEncodinghttp://127001': '2',
     # 需要改的就是这个东西
-    'ezproxy': 'CZ8jzZRc7trPiXx',
+    'ezproxy': 'tay2nCLHlr9I6e1',
 }
 
 login_url = 'http://data.people.com.cn.proxy.library.georgetown.edu/rmrb/20200515/1?code=2'

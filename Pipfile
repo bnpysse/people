@@ -6,8 +6,12 @@ verify_ssl = true
 [dev-packages]
 
 [packages]
-requests = "*"
 pyquery = "*"
+pypeteer = "*"
+pyppeteer = "*"
+lxml = "==4.5.1"
+six = "==1.15.0"
+websockets = "==7.0"
 
 [requires]
 python_version = "3.6"

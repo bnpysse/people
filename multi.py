@@ -1,4 +1,3 @@
-
 # 想着改成多线程的，可以一次性处理四个月份的数据，那样的话，会不会快一些？2020-05-28 09:12:35
 # 现在的处理方式是一次多运行多个程序，分别爬取不同的年份，好像也是可以的，但还是有点太麻烦了
 from pyquery import PyQuery as pq
@@ -51,7 +50,7 @@ def process_date(date_url, total, spec_date):
 
 def getYear(year, num=0):
     def getOneYear(my_year):
-        for m in range(5, 13):
+        for m in range(1, 13):
             start_month_time = datetime.now()
             print('Processing...{}年{:02d}月'.format(my_year, m))
             date_sheets = getMonth('{}-{:02d}'.format(my_year, m))

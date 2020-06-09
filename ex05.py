@@ -1,6 +1,3 @@
-
-# 想着改成多线程的，可以一次性处理四个月份的数据，那样的话，会不会快一些？2020-05-28 09:12:35
-# 现在的处理方式是一次多运行多个程序，分别爬取不同的年份，好像也是可以的，但还是有点太麻烦了
 from pyquery import PyQuery as pq
 import requests
 import calendar
@@ -25,11 +22,11 @@ def process_date(date_url, total, spec_date):
 
     # 总的版面数，也就是有几个详情文件，而某一版面中的若干篇文章是存在于这一版上面的，通过 #xxxx 锚点来确定文章的详情
     totalLayout = int(date_dict[k]['Layout'])
-    for layout in range(1, totalLayout + 1):
-        detail_url = '{}-{}'.format(date_url, layout)
-        detail_doc = pq(requests.get(detail_url, headers=headers).content.decode('utf-8'))
-
-        for k, v in enumerate(date_dict):
+    for k, v in enumerate(date_dict):
+        for layout in range(1, totalLayout + 1):
+            detail_url = '{}-{}'.format(date_url, layout)
+            detail_doc = pq(requests.get(detail_url, headers=headers).content.decode('utf-8'))
+            # print(detail_doc('.box').text())
             # 从date_dict当中取出第n版，解析出每篇文章的#id
             if date_dict[k]['Layout'] == layout:
                 # 取出 date_dict 对应的 #id
@@ -44,12 +41,12 @@ def process_date(date_url, total, spec_date):
 
 def getYear(year, num=0):
     def getOneYear(my_year):
-        for m in range(1, 13):
+        for m in range(3, 13):
             start_month_time = datetime.now()
             print('Processing...{}年{:02d}月'.format(my_year, m))
             date_sheets = getMonth('{}-{:02d}'.format(my_year, m))
             minutes, secs = divmod((datetime.now() - start_month_time).seconds, 60)
-            print('{}年{:02d}月，{:^4d}篇文章，共计用时 {:2d}分{:>2d}秒'.format(my_year, m, date_sheets, minutes, secs))
+            print('{}年{:02d}月，{}篇文章，共计用时 {:2d}分{:>2d}秒'.format(my_year, m, date_sheets, minutes, secs))
 
     if num > 0:
         for y in range(int(year), int(year) + num + 1):
@@ -83,7 +80,7 @@ def getMonth(month):
         if month_dict[k]['Quantity'] > 0:
             # print(month_dict[k]['Quantity'], '\t', month_dict[k]['Link'])
             # 处理某一天的情况
-            print('\tProcessing...{}, {:^4d}篇'.format(v['Date'], v['Quantity']), end=',')
+            print('\tProcessing...{}, {}篇'.format(v['Date'], v['Quantity']), end=',')
             start_time = datetime.now()
             total_sheet += v['Quantity']
             date_dict = process_date(month_dict[k]['Link'], month_dict[k]['Quantity'], v['Date'])
@@ -99,6 +96,7 @@ def getMonth(month):
 def writeMonth(month_dict, month):
     create_sql = 'CREATE TABLE if not exists `{}`( `id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, `Title` TEXT, `Link` TEXT, `Date` ' \
                  'TEXT, `Layout` INTEGER, `Content` TEXT)'
+
     add_sql = 'insert into `{}`(`Title`, `Link`, `Date`, `Layout`, `Content`) values("{}","{}","{}","{}","{}");'
     # 创建以年为单位的数据库，以月为单位的数据表，以文章为单位的数据条目记录
     conn = sqlite3.connect(month[:4] + '.db')
@@ -107,10 +105,7 @@ def writeMonth(month_dict, month):
     cursor.execute(create_sql.format(month))
     cursor.execute('begin transaction')
     for k, v in enumerate(month_dict):
-        try:
-            cursor.execute(add_sql.format(month, v['Title'], v['Link'], v['Date'], v['Layout'], v['Content']))
-        except sqlite3.Error as err:
-            print('Error:{}, Link:{}'.format(err, v['Link']))
+        cursor.execute(add_sql.format(month, v['Title'], v['Link'], v['Date'], v['Layout'], v['Content']))
     cursor.execute('commit')
     cursor.close()
     conn.close()
@@ -133,11 +128,10 @@ def init_month_dict(month):
         month_dict[k]['Quantity'] = 0
         month_dict[k]['Link'] = ''
         month_dict[k]['Date'] = '{}-{:02d}'.format(month, k + 1)
-
     return month_dict
 
 
 if __name__ == '__main__':
     # getMonth('1946-07')
     # process_date(base_url + '/' + '1946-05-15', 38)
-    getYear('1986', 3)
+    getYear('2003')
