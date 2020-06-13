@@ -29,10 +29,9 @@ cookies = requests.utils.cookiejar_from_dict(login_cookies_dict)
 login_s.get(login_url, headers=login_headers, cookies=cookies)
 
 # region Word list, and combine of word list AB,AC,ABC
-A = ["克林顿", "布什", "奥巴马", "特朗普", "蓬佩奥", "世界警察", "西方", "强盗", "势力", "政客"]
-B = ['枪支', "暴力", "人权", "单边主义", "保护主义", "帝国主义", "贸易", "新冷战", "倾销", "补贴", "关税", "种族"]
-C = ['强权', '霸权', '干涉', '谴责', '打压', '敦促', '勾连', '政治操弄', '虚伪', '双重标准', '嘴脸', '愤慨', '拙劣', '伪善', '抹黑', '歪曲', '别有用心', '污名化',
-     '丑化', '捕风捉影', '捏造', '图谋', '霸凌', '践踏', '敌对', '仇视', '指责']
+A = []
+B = []
+C = []
 # endregion
 
 date_start = '1993-01-01'
