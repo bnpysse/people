@@ -10,7 +10,7 @@ from pyquery import PyQuery as pq
 login_cookies_dict = {
     '_ga': 'GA1.2.576373095.1589077068',
     # 只需要改这个东东就可以，2020-06-11 17:14:42
-    'ezproxy': 'BosUt2d5p0TWQrw',
+    'ezproxy': 'J57bJRDaOxE5ijX',
 }
 
 login_url = 'http://data.people.com.cn.proxy.library.georgetown.edu/rmrb/20200515/1?code=2'
@@ -28,10 +28,15 @@ login_s = requests.session()
 cookies = requests.utils.cookiejar_from_dict(login_cookies_dict)
 login_s.get(login_url, headers=login_headers, cookies=cookies)
 
+
 # region Word list, and combine of word list AB,AC,ABC
-A = []
-B = []
-C = []
+def read_word_list(filename):
+    with open(filename) as f:
+        lines = f.readlines()
+        a = [line.rstrip() for line in lines[0].split(',')]
+        b = [line.rstrip() for line in lines[1].split(',')]
+        c = [line.rstrip() for line in lines[2].split(',')]
+    return a, b, c
 # endregion
 
 date_start = '1993-01-01'
@@ -176,4 +181,5 @@ def create_sqlite_db(table_name):
 
 
 if __name__ == '__main__':
+    A, B, C = read_word_list('.word_list.txt')
     get_word_frequency(A, B, 'AB')
