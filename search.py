@@ -136,20 +136,24 @@ def get_word_frequency(word_list1, word_list2, table_name):
                 try:
                     cursor.execute('begin transaction')
                     for k, v in enumerate(content_dict):
+
                         if 'Title' in content_dict[k].keys():
                             cursor.execute(
                                 insert_sql.format(table_name, content_dict[k]['Title'], content_dict[k]['Date'],
                                                   content_dict[k]['Keywords'], content_dict[k]['Count'],
                                                   content_dict[k]['Summary']))
-                except Exception as e:
-                    print(e)
-                    print(content_dict[k]['Summary'])
-                    cursor.execute('rollback')
-                finally:
                     cursor.execute('commit')
                     print('Processing..{}, 第{:>2d}页,用时：{:5.2f}秒'.format('+'.join(keywords), page,
-                                                                    (datetime.now() - start_page_time).seconds))
+                                                                        (datetime.now() - start_page_time).seconds))
                     count += 1
+                except Exception as e:
+                    print(e)
+                    tmp_string = insert_sql.format(table_name, content_dict[k]['Title'], content_dict[k]['Date'],
+                                                   content_dict[k]['Keywords'], content_dict[k]['Count'],
+                                                   content_dict[k]['Summary'])
+                    print(tmp_string)
+                    cursor.execute('rollback')
+
         except StopIteration as e:
             print('Generator is done:', e.value)
             minutes, secs = divmod((datetime.now() - start_time).seconds, 60)
