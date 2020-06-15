@@ -10,7 +10,7 @@ from pyquery import PyQuery as pq
 login_cookies_dict = {
     '_ga': 'GA1.2.576373095.1589077068',
     # 只需要改这个东东就可以，2020-06-11 17:14:42
-    'ezproxy': 'bXsqMZ5cHz6l5tg',
+    'ezproxy': '7eni2MulcC5SVaf',
 }
 
 login_url = 'http://data.people.com.cn.proxy.library.georgetown.edu/rmrb/20200515/1?code=2'
@@ -37,6 +37,8 @@ def read_word_list(filename):
         b = [line.rstrip() for line in lines[1].split(',')]
         c = [line.rstrip() for line in lines[2].split(',')]
     return a, b, c
+
+
 # endregion
 
 date_start = '1993-01-01'
@@ -64,6 +66,27 @@ qs = {"cIds": "23,", "cds": [
                      {"fld": "introTitle", "cdr": "OR", "hlt": "true", "vlr": "AND", "val": "暴力"},
                      {"fld": "contentText", "cdr": "OR", "hlt": "true", "vlr": "AND", "val": "暴力"}]}]}]}],
       "obs": [{"fld": "dataTime", "drt": "DESC"}, {"fld": "orderId", "drt": "DESC"}, {"fld": "seqid", "drt": "DESC"}]}
+# 三个词的情况，形成的查询字典
+qs3 = {"cIds": "23,", "cds": [{"cdr": "AND", "cds": [
+    {"fld": "dataTime.start", "cdr": "AND", "hlt": "false", "vlr": "OR", "val": "1993-01-01"},
+    {"fld": "dataTime.end", "cdr": "AND", "hlt": "false", "vlr": "OR", "val": "2020-06-10"}]}, {"cdr": "AND", "cds": [
+    {"cdr": "AND", "cds": [{"cdr": "AND",
+                            "cds": [{"fld": "title", "cdr": "OR", "hlt": "true", "vlr": "AND", "val": "政客"},
+                                    {"fld": "subTitle", "cdr": "OR", "hlt": "true", "vlr": "AND", "val": "政客"},
+                                    {"fld": "introTitle", "cdr": "OR", "hlt": "true", "vlr": "AND", "val": "政客"},
+                                    {"fld": "contentText", "cdr": "OR", "hlt": "true", "vlr": "AND", "val": "政客"}]},
+                           {"cdr": "AND",
+                            "cds": [{"fld": "title", "cdr": "OR", "hlt": "true", "vlr": "AND", "val": "暴力"},
+                                    {"fld": "subTitle", "cdr": "OR", "hlt": "true", "vlr": "AND", "val": "暴力"},
+                                    {"fld": "introTitle", "cdr": "OR", "hlt": "true", "vlr": "AND", "val": "暴力"},
+                                    {"fld": "contentText", "cdr": "OR", "hlt": "true", "vlr": "AND", "val": "暴力"}]},
+                           {"cdr": "AND",
+                            "cds": [{"fld": "title", "cdr": "OR", "hlt": "true", "vlr": "AND", "val": "霸权"},
+                                    {"fld": "subTitle", "cdr": "OR", "hlt": "true", "vlr": "AND", "val": "霸权"},
+                                    {"fld": "introTitle", "cdr": "OR", "hlt": "true", "vlr": "AND", "val": "霸权"},
+                                    {"fld": "contentText", "cdr": "OR", "hlt": "true", "vlr": "AND",
+                                     "val": "霸权"}]}]}]}],
+       "obs": [{"fld": "dataTime", "drt": "DESC"}, {"fld": "orderId", "drt": "DESC"}, {"fld": "seqid", "drt": "DESC"}]}
 
 
 # endregion
@@ -82,7 +105,98 @@ qs = {"cIds": "23,", "cds": [
 # print('{}'.format(qs['cds'][1]['cds'][0]['cds'][1]['cds'][1]['val']))
 # print('{}'.format(qs['cds'][1]['cds'][0]['cds'][1]['cds'][2]['val']))
 # print('{}'.format(qs['cds'][1]['cds'][0]['cds'][1]['cds'][3]['val']))
+# 第三个关键字
+# print('{}'.format(qs['cds'][1]['cds'][0]['cds'][2]['cds'][0]['val']))
+# print('{}'.format(qs['cds'][1]['cds'][0]['cds'][2]['cds'][1]['val']))
+# print('{}'.format(qs['cds'][1]['cds'][0]['cds'][2]['cds'][2]['val']))
+# print('{}'.format(qs['cds'][1]['cds'][0]['cds'][2]['cds'][3]['val']))
 # endregion
+
+
+# 建立三个词的组合查询串
+def building_qs_with_3(word_list1, word_list2, word_list3):
+    combination_list = list(itertools.product(word_list1, word_list2, word_list3))
+    for word in combination_list:
+        # 之所以四次循环，是把title,subTitle,introTitle,contentText四个字段都赋值
+        for i in range(4):
+            qs['cds'][1]['cds'][0]['cds'][0]['cds'][i]['val'] = word[0]
+            qs['cds'][1]['cds'][0]['cds'][1]['cds'][i]['val'] = word[1]
+            qs['cds'][1]['cds'][0]['cds'][2]['cds'][i]['val'] = word[2]
+        yield (word[0], word[1], word[2]), base_url + urllib.parse.quote(str(qs).replace('\'', '\"'))
+
+
+def get_word_frequency_with_3(word_list1, word_list2, word_list3, table_name):
+    count = 0
+    create_sqlite_db(table_name)
+    insert_sql = 'insert into `{}`(Title, Date, Keywords, Count, Summary) values("{}","{}","{}",{},"{}")'
+    conn = sqlite3.connect(database_name)
+    cursor = conn.cursor()
+    start_time = datetime.now()
+    gen = building_qs_with_3(word_list1, word_list2, word_list3)
+    while True:
+        try:
+            keywords, url = next(gen)
+            # 首先取出第1页的内容，然后获得总的页数，再取剩余的页的内容
+            form_data = {'pageNo': 1, 'pageSize': pageSize}
+            response = login_s.post(url, data=form_data, headers=post_headers, cookies=cookies).content.decode('utf-8')
+            doc = pq(response)
+            counter_string = doc('.pagination').text()
+            rec = re.findall('共( \d+ )条', counter_string)
+            page_total_string = re.findall('共( \d+ )页', counter_string)
+            page_total = int(page_total_string[0])
+            # TODO 应该处理查询结果为空的情况，有可能会出现的。2020-06-14 22:17:29
+            for page in range(1, page_total + 1):
+                start_page_time = datetime.now()
+                form_data['pageNo'] = page
+                content_dict = [dict() for i in range(pageSize)]
+                response = login_s.post(url, data=form_data, headers=post_headers, cookies=cookies).content.decode(
+                    'utf-8')
+                doc = pq(response)
+                for k, v in enumerate(doc('.articleSum_li').items()):
+                    # 直接取出该Tag下的所有文本，并分隔成字符串列表
+                    # 最末一项为‘来源： 人民日报 时间：。。。。’
+                    # 倒数第二项为简要
+                    # 剩余的内容组合成Title，因为有的时候Title会是两种不同的Tag来标识的
+                    lines = v.text().split('\n')
+                    content_dict[k]['Date'] = lines.pop(-1)[-10:]
+                    content_dict[k]['Summary'] = re.sub('<a href.*', '',
+                                                        v('p').html().
+                                                        replace('\t', '').replace('\n', '').
+                                                        replace('\"', '').replace('\'', ''))
+                    lines.pop(-1)
+                    content_dict[k]['Title'] = '\n'.join(lines)
+                    content_dict[k]['Count'] = int(rec[0])
+                    content_dict[k]['Keywords'] = ' '.join(keywords)
+
+                # 将content_dict写入数据库即可
+                try:
+                    cursor.execute('begin transaction')
+                    for k, v in enumerate(content_dict):
+
+                        if 'Title' in content_dict[k].keys():
+                            cursor.execute(
+                                insert_sql.format(table_name, content_dict[k]['Title'], content_dict[k]['Date'],
+                                                  content_dict[k]['Keywords'], content_dict[k]['Count'],
+                                                  content_dict[k]['Summary']))
+                    cursor.execute('commit')
+                    print('Processing..{}, 第{:>2d}页,用时：{:5.2f}秒'.format('+'.join(keywords), page,
+                                                                        (datetime.now() - start_page_time).seconds))
+                    count += 1
+                except Exception as e:
+                    print(e)
+                    tmp_string = insert_sql.format(table_name, content_dict[k]['Title'], content_dict[k]['Date'],
+                                                   content_dict[k]['Keywords'], content_dict[k]['Count'],
+                                                   content_dict[k]['Summary'])
+                    print(tmp_string)
+                    cursor.execute('rollback')
+
+        except StopIteration as e:
+            print('Generator is done:', e.value)
+            minutes, secs = divmod((datetime.now() - start_time).seconds, 60)
+            print('总计用时:{:2d}分{:>3d}秒'.format(minutes, secs))
+            cursor.close()
+            conn.close()
+            break
 
 
 def building_qs(word_list1, word_list2):
@@ -109,7 +223,11 @@ def get_word_frequency(word_list1, word_list2, table_name):
             # 首先取出第1页的内容，然后获得总的页数，再取剩余的页的内容
             form_data = {'pageNo': 1, 'pageSize': pageSize}
             response = login_s.post(url, data=form_data, headers=post_headers, cookies=cookies).content.decode('utf-8')
-            doc = pq(response)
+            try:
+                doc = pq(response)
+            except Exception as e:
+                print(e)
+                pass
             counter_string = doc('.pagination').text()
             rec = re.findall('共( \d+ )条', counter_string)
             page_total_string = re.findall('共( \d+ )页', counter_string)
@@ -120,7 +238,12 @@ def get_word_frequency(word_list1, word_list2, table_name):
                 content_dict = [dict() for i in range(pageSize)]
                 response = login_s.post(url, data=form_data, headers=post_headers, cookies=cookies).content.decode(
                     'utf-8')
-                doc = pq(response)
+                try:
+                    doc = pq(response)
+                except Exception as e:
+                    print(e)
+                    print(doc.content)
+                    pass
                 for k, v in enumerate(doc('.articleSum_li').items()):
                     # 直接取出该Tag下的所有文本，并分隔成字符串列表
                     # 最末一项为‘来源： 人民日报 时间：。。。。’
