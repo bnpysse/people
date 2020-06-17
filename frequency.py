@@ -13,7 +13,7 @@ from pyquery import PyQuery as pq
 login_cookies_dict = {
     '_ga': 'GA1.2.576373095.1589077068',
     # 只需要改这个东东就可以，2020-06-11 17:14:42
-    'ezproxy': '55WZcrW24FFPsFb',
+    'ezproxy': 'VjOISwcGrOgvy3X',
 }
 login_url = 'http://data.people.com.cn.proxy.library.georgetown.edu/rmrb/20200515/1?code=2'
 login_headers = {'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
@@ -106,7 +106,11 @@ def building_qs(last_words, *args):
 
 # endregion
 
-# region 从数据库中获取最末一个词组
+# region 从数据库中获取最末一个词组,有一种特殊情况，即这个词组已经完成，你重新运行程序的话，会全部删掉已经完成的词组，
+# 然后再重新开始爬取，会造成一些浪费。
+# 更准确的解决方案，应该是先统计最末单词的条数，然后读取网页，获得该词组所有的条数，如果小于这个词条数目，说明上次并没有完成
+# 那么就需要删除这些未完的记录，然后再次读取
+# 如果条数相等，说明这个词组已经完成了，那么就不应该删除这些记录，而应该进行下一次词组的爬取。2020-06-17 16:50:05
 def get_last_words(table_name):
     conn = sqlite3.connect(database_name)
     conn.row_factory = sqlite3.Row
@@ -129,6 +133,8 @@ def get_last_words(table_name):
         cur.close()
         conn.close()
         return last_words
+
+
 # endregion
 
 
@@ -136,7 +142,7 @@ def get_word_frequency(table_name, *args):
     create_sqlite_db(table_name)
 
     # layout、Count为数值型 ！！
-    insert_sql = 'insert into `{}`(Title, Date, KeyWords, MyWords, Layout, Count, Summary) values("{}","{}","{}","{}", {}, {},"{}")'
+    insert_sql = """insert into `{}`(Title, Date, KeyWords, MyWords, Layout, Count, Summary) values('{}','{}','{}','{}',{},{},'{}')"""
     conn = sqlite3.connect(database_name)
     cursor = conn.cursor()
     start_time = datetime.now()
@@ -146,11 +152,14 @@ def get_word_frequency(table_name, *args):
     while True:
         try:
             my_words, url = next(gen)
+            page = 1
             print(my_words, url.format(page, pageSize))
             # 首先取出第1页的内容，然后获得总的页数，再取剩余的页的内容
             response = login_s.get(url.format(page, pageSize), headers=login_headers,
                                    cookies=cookies).content.decode('utf-8')
             doc = pq(response)
+            if doc('.none_find').text():
+                continue
             total_record_num = int(doc('#allDataCount').text())
             page_total = math.ceil(total_record_num / pageSize)
             # 应该从第 2 页开始?好像是不对的，还是应该从第一页
@@ -170,13 +179,13 @@ def get_word_frequency(table_name, *args):
                     # 版次： re.findall('第(\d+)版', doc('.listinfo').eq(49).text())
                     # 摘要： doc('.listinfo').eq(42).next()('p').text()
                     # 文章关键词：doc('.keywords').text()
-                    content_dict[k]['Title'] = v('h3').text()
-                    public_date = v('.listinfo').text()
+                    content_dict[k]['Title'] = v('h3').text().replace('\'', '\'\'')
+                    public_date = v('.listinfo').text().replace('\'', '\'\'')
                     content_dict[k]['Date'] = public_date[:public_date.rindex('日') + 1]
                     content_dict[k]['Layout'] = int(re.findall('第(\d+)版', v('.listinfo').text())[0])
                     # content_dict[k]['Summary'] = v('.listinfo').next()('p').html().replace('\n', '').replace('\t', '')
-                    content_dict[k]['Summary'] = v('.listinfo').next()('p').text()
-                    content_dict[k]['KeyWords'] = v('.keywords').text()[7:]
+                    content_dict[k]['Summary'] = v('.listinfo').next()('p').text().replace('\'', '\'\'')
+                    content_dict[k]['KeyWords'] = v('.keywords').text().replace('\'', '\'\'')[7:]
                     content_dict[k]['Count'] = total_record_num
                     content_dict[k]['MyWords'] = ' '.join(my_words)
 
@@ -191,8 +200,10 @@ def get_word_frequency(table_name, *args):
                                                   content_dict[k]['Layout'], content_dict[k]['Count'],
                                                   content_dict[k]['Summary']))
                     cursor.execute('commit')
-                    print('Processing..{}, 第{:>2d}页,用时：{:5.2f}秒'.format('+'.join(my_words), page,
-                                                                        (datetime.now() - start_page_time).seconds))
+                    print('Processing..{}, 第{:>2d}页/总{:>3d}页/总{:>4d}条,用时：{:5.2f}秒'.
+                          format('+'.join(my_words), page,
+                                 page_total, total_record_num,
+                                 (datetime.now() - start_page_time).seconds))
                 except Exception as e:
                     print(e, content_dict[k]['KeyWords'])
                     cursor.execute('rollback')
