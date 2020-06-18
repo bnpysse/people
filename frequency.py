@@ -13,7 +13,7 @@ from pyquery import PyQuery as pq
 login_cookies_dict = {
     '_ga': 'GA1.2.576373095.1589077068',
     # 只需要改这个东东就可以，2020-06-11 17:14:42
-    'ezproxy': 'VjOISwcGrOgvy3X',
+    'ezproxy': 'M1CmZmtMGXXEVFT',
 }
 login_url = 'http://data.people.com.cn.proxy.library.georgetown.edu/rmrb/20200515/1?code=2'
 login_headers = {'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
@@ -181,7 +181,8 @@ def get_word_frequency(table_name, *args):
                     # 文章关键词：doc('.keywords').text()
                     content_dict[k]['Title'] = v('h3').text().replace('\'', '\'\'')
                     public_date = v('.listinfo').text().replace('\'', '\'\'')
-                    content_dict[k]['Date'] = public_date[:public_date.rindex('日') + 1]
+                    pos = public_date.find('日')
+                    content_dict[k]['Date'] = public_date[:pos + 1] if pos != -1 else '空日期'
                     content_dict[k]['Layout'] = int(re.findall('第(\d+)版', v('.listinfo').text())[0])
                     # content_dict[k]['Summary'] = v('.listinfo').next()('p').html().replace('\n', '').replace('\t', '')
                     content_dict[k]['Summary'] = v('.listinfo').next()('p').text().replace('\'', '\'\'')
