@@ -13,7 +13,7 @@ from pyquery import PyQuery as pq
 login_cookies_dict = {
     '_ga': 'GA1.2.576373095.1589077068',
     # 只需要改这个东东就可以，2020-06-11 17:14:42
-    'ezproxy': 'M1CmZmtMGXXEVFT',
+    'ezproxy': 'Q519XHzcZ4zXykW',
 }
 login_url = 'http://data.people.com.cn.proxy.library.georgetown.edu/rmrb/20200515/1?code=2'
 login_headers = {'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
@@ -90,18 +90,20 @@ def building_qs(last_words, *args):
     if last_words is not None:
         pos = combination_list.index(tuple(last_words.split(' ')))
         combination_list = combination_list[pos:]
-    for word in combination_list:
+    for pos, word in enumerate(combination_list):
         if len(args) == 2:
             for i in range(4):
                 qs_2['cds'][2]['cds'][i]['val'] = word[0]
                 qs_2['cds'][3]['cds'][i]['val'] = word[1]
-            yield word, base_url + urllib.parse.quote(str(qs_2).replace('\'', '\"')).replace(' ', '') + base_url_tail
+            yield ([pos + 1, len(combination_list)]), word, \
+                  base_url + urllib.parse.quote(str(qs_2).replace('\'', '\"')).replace(' ', '') + base_url_tail
         elif len(args) == 3:
             for i in range(4):
                 qs_3['cds'][2]['cds'][i]['val'] = word[0]
                 qs_3['cds'][3]['cds'][i]['val'] = word[1]
                 qs_3['cds'][4]['cds'][i]['val'] = word[2]
-            yield word, base_url + urllib.parse.quote(str(qs_3).replace('\'', '\"')).replace(' ', '') + base_url_tail
+            yield ([pos + 1, len(combination_list)]), word, \
+                  base_url + urllib.parse.quote(str(qs_3).replace('\'', '\"')).replace(' ', '') + base_url_tail
 
 
 # endregion
@@ -145,15 +147,14 @@ def get_word_frequency(table_name, *args):
     insert_sql = """insert into `{}`(Title, Date, KeyWords, MyWords, Layout, Count, Summary) values('{}','{}','{}','{}',{},{},'{}')"""
     conn = sqlite3.connect(database_name)
     cursor = conn.cursor()
-    start_time = datetime.now()
     last_words = get_last_words(table_name)
     page = 1
     gen = building_qs(last_words, *args)
     while True:
         try:
-            my_words, url = next(gen)
+            scale_word, my_words, url = next(gen)
             page = 1
-            print(my_words, url.format(page, pageSize))
+            print(scale_word[0], '/', scale_word[1], my_words, url.format(page, pageSize))
             # 首先取出第1页的内容，然后获得总的页数，再取剩余的页的内容
             response = login_s.get(url.format(page, pageSize), headers=login_headers,
                                    cookies=cookies).content.decode('utf-8')
@@ -162,6 +163,7 @@ def get_word_frequency(table_name, *args):
                 continue
             total_record_num = int(doc('#allDataCount').text())
             page_total = math.ceil(total_record_num / pageSize)
+            start_time = datetime.now()
             # 应该从第 2 页开始?好像是不对的，还是应该从第一页
             for page in range(1, page_total + 1):
                 content_dict = [dict() for i in range(pageSize)]
@@ -208,7 +210,8 @@ def get_word_frequency(table_name, *args):
                 except Exception as e:
                     print(e, content_dict[k]['KeyWords'])
                     cursor.execute('rollback')
-
+            minutes, secs = divmod((datetime.now() - start_time).seconds, 60)
+            print('\tProcessing..{}，总计时间：{:2d}分{:2d}秒'.format('+'.join(my_words), minutes, secs))
         except StopIteration as e:
             print('Generator is done:', e.value)
             minutes, secs = divmod((datetime.now() - start_time).seconds, 60)
