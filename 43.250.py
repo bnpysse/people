@@ -26,13 +26,13 @@ detail_url = 'http://43.250.238.143.proxy.library.georgetown.edu/download_log.js
 search_url = 'http://43.250.238.143.proxy.library.georgetown.edu/search?channelid={}'
 
 login_cookies_dict = {
-    'ezproxy': 'FZfVYKeA41E5cV5',
+    'ezproxy': 'FYcn3h9FiWyVXro',
     # 'pass': '11%2C101%2C103%2C104%2C105%2C107%2C114%2C129%2C',
     # 'userid': 'georgetownuc',
     # 'username': 'Georgetown%2BUniversity',
-    # 'Hm_lpvt_fea96aed2ece526c02d508e0b9ab0c79': '1593158742',
+    'Hm_lpvt_fea96aed2ece526c02d508e0b9ab0c79': '1593173439',
     # 'Hm_lvt_fea96aed2ece526c02d508e0b9ab0c79': '1593105751',
-    'JSESSIONID': '39D73D0AD96AAF24EAEF3365067FDB0C',
+    'JSESSIONID': '50133EF6F9AB89D9EAAC0E4CDA7E1FE5',
 }
 login_headers = {'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
                  'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu '
@@ -124,7 +124,8 @@ def get_month(ym):
             print('\tProcessing..{:4d}条记录，用时:{:3d}秒，累计用时:{:2d}分{:2d}秒'.
                   format(rec + 1, (datetime.now() - start_page_time).seconds, minutes, secs))
             start_page_time = datetime.now()
-
+    if 'Title' in content_dict[0].keys():
+        writeMonth(ym, content_dict, rec)
     minutes, secs = divmod((datetime.now() - start_month_time).seconds, 60)
     print('处理{}年{}月数据，共{:^4d}条记录，统计用时:{:2d}分{:2d}秒'.format(ym[:4], ym[4:], total_rec, minutes, secs))
 
@@ -157,4 +158,4 @@ def get_multi_month(start_year, start_month, end_month):
 
 
 if __name__ == '__main__':
-    get_month('201903')
+    get_month('201904')

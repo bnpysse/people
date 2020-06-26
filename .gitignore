@@ -3,3 +3,9 @@
 *.csv
 .idea
 .wordlist.py
+.word_list.txt
+*.js
+*.css
+*.jpg
+*.zip
+*.txt
