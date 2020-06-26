@@ -13,7 +13,7 @@ from pyquery import PyQuery as pq
 login_cookies_dict = {
     '_ga': 'GA1.2.576373095.1589077068',
     # 只需要改这个东东就可以，2020-06-11 17:14:42
-    'ezproxy': '3mmkPwokhFJOYUz',
+    'ezproxy': 'FZfVYKeA41E5cV5',
 }
 login_url = 'http://data.people.com.cn.proxy.library.georgetown.edu/rmrb/20200515/1?code=2'
 login_headers = {'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
@@ -35,37 +35,37 @@ base_url = 'http://data.people.com.cn.proxy.library.georgetown.edu/rmrb/s?qs='
 
 # 两个词的情况
 # 访问的时候是：qs_2['cds'][2..3]['cds'][0..3]['val'],第一标为两个关键字，第二标为四种不同的变量
-qs_2={
-"cds":[{"fld":"dataTime.start","cdr":"AND","hlt":"false","vlr":"AND","qtp":"DEF","val":date_start},
-{"fld":"dataTime.end","cdr":"AND","hlt":"false","vlr":"AND","qtp":"DEF","val":date_end},
-{"cdr":"AND","cds":[{"fld":"title","cdr":"OR","hlt":"true","vlr":"OR","val":"克林顿"},
-{"fld":"subTitle","cdr":"OR","hlt":"true","vlr":"OR","val":"克林顿"},
-{"fld":"introTitle","cdr":"OR","hlt":"true","vlr":"OR","val":"克林顿"},
-{"fld":"contentText","cdr":"OR","hlt":"true","vlr":"OR","val":"克林顿"}]},
-{"cdr":"AND","cds":[{"fld":"title","cdr":"OR","hlt":"true","vlr":"OR","val":"枪支"},
-{"fld":"subTitle","cdr":"OR","hlt":"true","vlr":"OR","val":"枪支"},
-{"fld":"introTitle","cdr":"OR","hlt":"true","vlr":"OR","val":"枪支"},
-{"fld":"contentText","cdr":"OR","hlt":"true","vlr":"OR","val":"枪支"}]}],
-"obs":[{"fld":"dataTime","drt":"ASC"}]}
+qs_2 = {
+    "cds": [{"fld": "dataTime.start", "cdr": "AND", "hlt": "false", "vlr": "AND", "qtp": "DEF", "val": date_start},
+            {"fld": "dataTime.end", "cdr": "AND", "hlt": "false", "vlr": "AND", "qtp": "DEF", "val": date_end},
+            {"cdr": "AND", "cds": [{"fld": "title", "cdr": "OR", "hlt": "true", "vlr": "OR", "val": "克林顿"},
+                                   {"fld": "subTitle", "cdr": "OR", "hlt": "true", "vlr": "OR", "val": "克林顿"},
+                                   {"fld": "introTitle", "cdr": "OR", "hlt": "true", "vlr": "OR", "val": "克林顿"},
+                                   {"fld": "contentText", "cdr": "OR", "hlt": "true", "vlr": "OR", "val": "克林顿"}]},
+            {"cdr": "AND", "cds": [{"fld": "title", "cdr": "OR", "hlt": "true", "vlr": "OR", "val": "枪支"},
+                                   {"fld": "subTitle", "cdr": "OR", "hlt": "true", "vlr": "OR", "val": "枪支"},
+                                   {"fld": "introTitle", "cdr": "OR", "hlt": "true", "vlr": "OR", "val": "枪支"},
+                                   {"fld": "contentText", "cdr": "OR", "hlt": "true", "vlr": "OR", "val": "枪支"}]}],
+    "obs": [{"fld": "dataTime", "drt": "ASC"}]}
 
-#三个词的查询串
-#访问的时候是：qs_3['cds'][2..4]['cds'][0..3]['val'],第一标为三个关键字，第二标为四种不同的变量
-qs_3={
-"cds":[{"fld":"dataTime.start","cdr":"AND","hlt":"false","vlr":"AND","qtp":"DEF","val":date_start},
-{"fld":"dataTime.end","cdr":"AND","hlt":"false","vlr":"AND","qtp":"DEF","val":date_end},
-{"cdr":"AND","cds":[{"fld":"title","cdr":"OR","hlt":"true","vlr":"OR","val":"克林顿"},
-{"fld":"subTitle","cdr":"OR","hlt":"true","vlr":"OR","val":"克林顿"},
-{"fld":"introTitle","cdr":"OR","hlt":"true","vlr":"OR","val":"克林顿"},
-{"fld":"contentText","cdr":"OR","hlt":"true","vlr":"OR","val":"克林顿"}]},
-{"cdr":"AND","cds":[{"fld":"title","cdr":"OR","hlt":"true","vlr":"OR","val":"枪支"},
-{"fld":"subTitle","cdr":"OR","hlt":"true","vlr":"OR","val":"枪支"},
-{"fld":"introTitle","cdr":"OR","hlt":"true","vlr":"OR","val":"枪支"},
-{"fld":"contentText","cdr":"OR","hlt":"true","vlr":"OR","val":"枪支"}]},
-{"cdr":"AND","cds":[{"fld":"title","cdr":"OR","hlt":"true","vlr":"OR","val":"暴力"},
-{"fld":"subTitle","cdr":"OR","hlt":"true","vlr":"OR","val":"暴力"},
-{"fld":"introTitle","cdr":"OR","hlt":"true","vlr":"OR","val":"暴力"},
-{"fld":"contentText","cdr":"OR","hlt":"true","vlr":"OR","val":"暴力"}]}],
-"obs":[{"fld":"dataTime","drt":"ASC"}]}
+# 三个词的查询串
+# 访问的时候是：qs_3['cds'][2..4]['cds'][0..3]['val'],第一标为三个关键字，第二标为四种不同的变量
+qs_3 = {
+    "cds": [{"fld": "dataTime.start", "cdr": "AND", "hlt": "false", "vlr": "AND", "qtp": "DEF", "val": date_start},
+            {"fld": "dataTime.end", "cdr": "AND", "hlt": "false", "vlr": "AND", "qtp": "DEF", "val": date_end},
+            {"cdr": "AND", "cds": [{"fld": "title", "cdr": "OR", "hlt": "true", "vlr": "OR", "val": "克林顿"},
+                                   {"fld": "subTitle", "cdr": "OR", "hlt": "true", "vlr": "OR", "val": "克林顿"},
+                                   {"fld": "introTitle", "cdr": "OR", "hlt": "true", "vlr": "OR", "val": "克林顿"},
+                                   {"fld": "contentText", "cdr": "OR", "hlt": "true", "vlr": "OR", "val": "克林顿"}]},
+            {"cdr": "AND", "cds": [{"fld": "title", "cdr": "OR", "hlt": "true", "vlr": "OR", "val": "枪支"},
+                                   {"fld": "subTitle", "cdr": "OR", "hlt": "true", "vlr": "OR", "val": "枪支"},
+                                   {"fld": "introTitle", "cdr": "OR", "hlt": "true", "vlr": "OR", "val": "枪支"},
+                                   {"fld": "contentText", "cdr": "OR", "hlt": "true", "vlr": "OR", "val": "枪支"}]},
+            {"cdr": "AND", "cds": [{"fld": "title", "cdr": "OR", "hlt": "true", "vlr": "OR", "val": "暴力"},
+                                   {"fld": "subTitle", "cdr": "OR", "hlt": "true", "vlr": "OR", "val": "暴力"},
+                                   {"fld": "introTitle", "cdr": "OR", "hlt": "true", "vlr": "OR", "val": "暴力"},
+                                   {"fld": "contentText", "cdr": "OR", "hlt": "true", "vlr": "OR", "val": "暴力"}]}],
+    "obs": [{"fld": "dataTime", "drt": "ASC"}]}
 
 base_url_tail = '&tr=A&ss=1&pageNo={}&pageSize={}'
 
@@ -80,6 +80,8 @@ def read_word_list(filename):
         b = [line.rstrip() for line in lines[1].split(',')]
         c = [line.rstrip() for line in lines[2].split(',')]
     return a, b, c
+
+
 # endregion
 
 # region 生成组合词组,如果在数据库中有最末词组，则更改生成词组的列表
@@ -108,6 +110,8 @@ def building_qs(last_words, *args):
                 qs_3['cds'][4]['cds'][i]['val'] = word[2]
             yield ([pos + 1, total_words - reminder_words - pos - 1, total_words]), word, \
                   base_url + urllib.parse.quote(str(qs_3).replace('\'', '\"')).replace(' ', '') + base_url_tail
+
+
 # endregion
 
 # region 从数据库中获取最末一个词组,有一种特殊情况，即这个词组已经完成，你重新运行程序的话，会全部删掉已经完成的词组，
@@ -159,8 +163,8 @@ def get_word_frequency(table_name, *args):
             scale_word, my_words, url = next(gen)
             page = 1
             # print(scale_word[0], '/', scale_word[1], scale_word[2],  my_words, url.format(page, pageSize))
-            print(f'{scale_word[0]}/{scale_word[1]}, 总数:{scale_word[2]},'
-                  f'已完成率：{(scale_word[2]-scale_word[1])/scale_word[2]:4.2%}, {my_words}, {url.format(page, pageSize)}')
+            print(f'{scale_word[0]}/剩:{scale_word[1]}, 总:{scale_word[2]},'
+                  f'已完成:{(scale_word[2] - scale_word[1]) / scale_word[2]:5.2%}, {my_words}, {url.format(page, pageSize)}')
             # 首先取出第1页的内容，然后获得总的页数，再取剩余的页的内容
             response = login_s.get(url.format(page, pageSize), headers=login_headers,
                                    cookies=cookies).content.decode('utf-8')
@@ -260,7 +264,7 @@ def get_rec_count(table_name, *args):
         print('The total of {} is {}'.format(w, result['total']))
     else:
         combination_list = list(itertools.product(*args))
-        for k,v in enumerate(combination_list):
+        for k, v in enumerate(combination_list):
             w = ' '.join([*v])
             result = cur.execute(sql_words_total.format(table_name, w)).fetchone()
             print('{:>5d}--{:<20}Record is {:>5d}'.format(k, w, result['total']))
@@ -273,5 +277,5 @@ if __name__ == '__main__':
     # 有些情况下，当知晓最后一个词组是完整的情况下，是不需要删除数据库记录的，不然的话，还需要重新读取。
     # 尤其是出错的情况下，再次读取时，默认状态下是删除最后一组词不完整的情况，执行后仍未获取到相关页面，
     # 这种情况下就需要在这里进行设置为 False,即不能再删除了。哈哈，2020-06-19 18:50:33
-    is_delete_last_words = True
+    is_delete_last_words = False
     get_word_frequency('ABC', A, B, C)
