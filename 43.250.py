@@ -26,21 +26,21 @@ detail_url = 'http://43.250.238.143.proxy.library.georgetown.edu/download_log.js
 search_url = 'http://43.250.238.143.proxy.library.georgetown.edu/search?channelid={}'
 
 login_cookies_dict = {
-    'ezproxy': 'FYcn3h9FiWyVXro',
+    'ezproxy': '3FoRbpgxMQHp74e',
     # 'pass': '11%2C101%2C103%2C104%2C105%2C107%2C114%2C129%2C',
     # 'userid': 'georgetownuc',
     # 'username': 'Georgetown%2BUniversity',
-    'Hm_lpvt_fea96aed2ece526c02d508e0b9ab0c79': '1593173439',
+    # 'Hm_lpvt_fea96aed2ece526c02d508e0b9ab0c79': '1593219150',
     # 'Hm_lvt_fea96aed2ece526c02d508e0b9ab0c79': '1593105751',
-    'JSESSIONID': '50133EF6F9AB89D9EAAC0E4CDA7E1FE5',
+    'JSESSIONID': 'BB9E49AB07E1660B52CE4AD35CE0895C',
 }
+login_s = requests.session()
+pageSize = 50
 login_headers = {'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
                  'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu '
                                'Chromium/68.0.3440.106 Chrome/68.0.3440.106 Safari/537.36',
                  'Content-Type': 'text/html;charset=UTF-8',
                  }
-login_s = requests.session()
-pageSize = 50
 
 
 def writeMonth(ym, content_dict, rec_id):
@@ -158,4 +158,4 @@ def get_multi_month(start_year, start_month, end_month):
 
 
 if __name__ == '__main__':
-    get_month('201904')
+    get_month('201905')

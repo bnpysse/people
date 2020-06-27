@@ -13,7 +13,7 @@ from pyquery import PyQuery as pq
 login_cookies_dict = {
     '_ga': 'GA1.2.576373095.1589077068',
     # 只需要改这个东东就可以，2020-06-11 17:14:42
-    'ezproxy': 'FYcn3h9FiWyVXro',
+    'ezproxy': 'H83l3VTp0uPwITk',
 }
 login_url = 'http://data.people.com.cn.proxy.library.georgetown.edu/rmrb/20200515/1?code=2'
 login_headers = {'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',

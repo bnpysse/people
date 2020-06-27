@@ -15,7 +15,7 @@ from pyquery import PyQuery as pq
 login_cookies_dict = {
     '_ga': 'GA1.2.576373095.1589077068',
     # 只需要改这个东东就可以，2020-06-11 17:14:42
-    'ezproxy': '2BY4iVSZv25bVX2',
+    'ezproxy': 'xunZW20bHCP7Xy8',
 }
 login_url = 'http://data.people.com.cn.proxy.library.georgetown.edu/rmrb/20200515/1?code=2'
 login_headers = {'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
@@ -31,7 +31,10 @@ qs = {"cds": [{"fld": "dataTime", "cdr": "AND", "hlt": "false", "vlr": "OR", "qt
 
 login_s = requests.session()
 cookies = requests.utils.cookiejar_from_dict(login_cookies_dict)
-login_s.get(login_url, headers=login_headers, cookies=cookies)
+try:
+    login_s.get(login_url, headers=login_headers, cookies=cookies)
+except Exception as e:
+    print('Error: {}'.format(e))
 
 
 def get_count(year, month):
@@ -57,17 +60,23 @@ def get_day_url(year, month):
     return date_list
 
 
-def writeMonth(year, month):
+def writeMonth(year, *args):
+    if len(args) == 2:
+        # 起始月份，终止月份
+        start_month = args[0] if args[0] > 0 else 1
+        end_month = args[1] if args[1] < 13 else 12
     sql_insert = 'INSERT INTO `article_count`(Date,Count) values("{}",{})'
-    url_list = get_count(year, month)
-    create_sqlite_db()
-    conn = sqlite3.connect(database_name)
-    cursor = conn.cursor()
-    cursor.execute('begin transaction')
-    for k, v in enumerate(url_list):
-        cursor.execute(sql_insert.format(v['Date'], v['Count']))
-    cursor.execute('commit')
-    cursor.execute('end transaction')
+    for month in range(start_month, end_month + 1):
+        url_list = get_count(year, month)
+        create_sqlite_db()
+        conn = sqlite3.connect(database_name)
+        cursor = conn.cursor()
+        cursor.execute('begin transaction')
+        for k, v in enumerate(url_list):
+            cursor.execute(sql_insert.format(v['Date'], v['Count']))
+        cursor.execute('commit')
+        cursor.close()
+        conn.close()
 
 
 def create_sqlite_db():
@@ -83,9 +92,14 @@ def create_sqlite_db():
 
 
 def writeYear(year):
+    start_time = datetime.now()
     for month in range(1, 13):
+        start_month_time = datetime.now()
         writeMonth(year, month)
+        print(f'Processing..{year}年{month:2d}月，用时：{(datetime.now() - start_month_time).seconds:3d}，'
+              f'累计用时：{(datetime.now() - start_time).seconds:3d}')
 
 
 if __name__ == '__main__':
-    writeMonth(1993)
+    # writeYear(1993)
+    writeMonth(1993, 2, 12)
