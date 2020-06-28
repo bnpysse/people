@@ -13,7 +13,7 @@ from pyquery import PyQuery as pq
 login_cookies_dict = {
     '_ga': 'GA1.2.576373095.1589077068',
     # 只需要改这个东东就可以，2020-06-11 17:14:42
-    'ezproxy': 'H83l3VTp0uPwITk',
+    'ezproxy': '3Cojg88u4rREqf1',
 }
 login_url = 'http://data.people.com.cn.proxy.library.georgetown.edu/rmrb/20200515/1?code=2'
 login_headers = {'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
@@ -91,7 +91,10 @@ def building_qs(last_words, *args):
     total_words = len(combination_list)
     reminder_words = 1
     if last_words is not None:
-        pos = combination_list.index(tuple(last_words.split(' ')))
+        if tuple(last_words.split(' ')) not in combination_list:
+            pos = 0
+        else:
+            pos = combination_list.index(tuple(last_words.split(' ')))
         pos = pos if is_delete_last_words else pos + 1
         combination_list = combination_list[pos:]
         # 如果词组发生了变化，那么对剩余词组数目重新赋值

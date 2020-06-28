@@ -26,13 +26,13 @@ detail_url = 'http://43.250.238.143.proxy.library.georgetown.edu/download_log.js
 search_url = 'http://43.250.238.143.proxy.library.georgetown.edu/search?channelid={}'
 
 login_cookies_dict = {
-    'ezproxy': '3FoRbpgxMQHp74e',
+    'ezproxy': '1mSSRmCugrAjIQc',
     # 'pass': '11%2C101%2C103%2C104%2C105%2C107%2C114%2C129%2C',
     # 'userid': 'georgetownuc',
     # 'username': 'Georgetown%2BUniversity',
-    # 'Hm_lpvt_fea96aed2ece526c02d508e0b9ab0c79': '1593219150',
+    # 'Hm_lpvt_fea96aed2ece526c02d508e0b9ab0c79': '1593357761',
     # 'Hm_lvt_fea96aed2ece526c02d508e0b9ab0c79': '1593105751',
-    'JSESSIONID': 'BB9E49AB07E1660B52CE4AD35CE0895C',
+    'JSESSIONID': 'C35B1853420F10A3411C0DA3BF7D8688',
 }
 login_s = requests.session()
 pageSize = 50
@@ -98,7 +98,7 @@ def get_last_rec(ym):
 def get_month(ym):
     start_month_time = datetime.now()
     html = login_s.get(search_url.format(ym), headers=login_headers,
-                       cookies=requests.utils.cookiejar_from_dict(login_cookies_dict)).content.decode('gb18030')
+                       cookies=requests.utils.cookiejar_from_dict(login_cookies_dict)).content.decode('gb18030', 'ignore')
     doc = pq(html)
     # 读出数据库中已存的记录，得做比较。因为可能会有错误发生，就应该接着上次出错的位置去做
     last_rec = get_last_rec(ym)
@@ -132,7 +132,8 @@ def get_month(ym):
 
 def analy_detail(content_dict, rec, ym):
     html = login_s.get(detail_url.format(rec + 1, ym), headers=login_headers,
-                       cookies=requests.utils.cookiejar_from_dict(login_cookies_dict)).content.decode('gb18030')
+                       cookies=requests.utils.cookiejar_from_dict(login_cookies_dict)).content.decode('gb18030',
+                                                                                                      'ignore')
     doc = pq(html)
     lines = doc('rec').html().replace('\r', '').split('\n')
     content_dict[rec % pageSize]['ID'] = rec
@@ -158,4 +159,5 @@ def get_multi_month(start_year, start_month, end_month):
 
 
 if __name__ == '__main__':
-    get_month('201905')
+    get_month('201910')
+    get_month('201911')
