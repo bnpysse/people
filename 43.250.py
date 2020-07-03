@@ -26,13 +26,13 @@ detail_url = 'http://43.250.238.143.proxy.library.georgetown.edu/download_log.js
 search_url = 'http://43.250.238.143.proxy.library.georgetown.edu/search?channelid={}'
 
 login_cookies_dict = {
-    'ezproxy': '1mSSRmCugrAjIQc',
+    'ezproxy': 'nhIDg5ZYlwSu0T2',
     # 'pass': '11%2C101%2C103%2C104%2C105%2C107%2C114%2C129%2C',
     # 'userid': 'georgetownuc',
     # 'username': 'Georgetown%2BUniversity',
-    # 'Hm_lpvt_fea96aed2ece526c02d508e0b9ab0c79': '1593357761',
+    # 'Hm_lpvt_fea96aed2ece526c02d508e0b9ab0c79': '1593568462',
     # 'Hm_lvt_fea96aed2ece526c02d508e0b9ab0c79': '1593105751',
-    'JSESSIONID': 'C35B1853420F10A3411C0DA3BF7D8688',
+    'JSESSIONID': '45FC4F5F5D3BA2E26B33389999E40DAB',
 }
 login_s = requests.session()
 pageSize = 50
@@ -106,6 +106,9 @@ def get_month(ym):
     start_rec = 0
     if last_rec < total_rec:
         start_rec = last_rec
+    else:
+        print(f'{ym[:4]}年{ym[4:]}月数据已经处理完毕！')
+        return
     print('处理{}年{}月数据，数据库中已有{:^4d}条记录，共{:^4d}条记录'.format(ym[:4], ym[4:], last_rec, total_rec))
     content_dict = [{} for i in range(pageSize)]
     start_page_time = datetime.now()
@@ -159,5 +162,11 @@ def get_multi_month(start_year, start_month, end_month):
 
 
 if __name__ == '__main__':
-    get_month('201910')
-    get_month('201911')
+
+    get_month('201806')
+    get_month('201807')
+    get_month('201808')
+    get_month('201809')
+    get_month('201810')
+    get_month('201811')
+    get_month('201812')

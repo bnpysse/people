@@ -10,8 +10,10 @@ pyquery = "*"
 pyppeteer = "*"
 lxml = "==4.5.1"
 six = "==1.15.0"
-websockets = "==7.0"
+websockets = "==8.1"
 requests-html = "*"
+more-collections = "*"
+more-itertools = "<=5.0.0"
 
 [requires]
 python_version = "3.6"

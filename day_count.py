@@ -15,10 +15,10 @@ from pyquery import PyQuery as pq
 login_cookies_dict = {
     # '_ga': 'GA1.2.576373095.1589077068',
     # 只需要改这个东东就可以，2020-06-11 17:14:42
-    'JSESSIONID': '089FDF2A2332E7B73B480B0A08FB99E4',
-    'ezproxy': 'xxKbqlgaZtOTF9k',
+    'JSESSIONID': '8D88531154544921063069167EDE01E2',
+    'ezproxy': '6AydvMiD22cUvI5',
 }
-login_url = 'http://data.people.com.cn.proxy.library.georgetown.edu/rmrb/20200515/1?code=2'
+login_url = 'http://data.people.com.cn.proxy.library.georgetown.edu/rmrb/20200702/1?code=2'
 login_headers = {'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
                  'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu '
                                'Chromium/68.0.3440.106 Chrome/68.0.3440.106 Safari/537.36',
@@ -37,6 +37,7 @@ try:
     resp = login_s.get(login_url, headers=login_headers, cookies=cookies)
     if resp.status_code == 429:
         print('429 Error, It''s end')
+        exit(1)
 except Exception as e:
     print('Error: {}'.format(e))
 
@@ -88,7 +89,7 @@ def writeMonth(year, *args):
         # 起始月份，终止月份
         start_month = args[0] if args[0] > 0 else 1
         end_month = args[1] if args[1] < 13 else 12
-    sql_insert = 'INSERT INTO `article_count`(Date,Count,LayoutNumber) values("{}",{},{})'
+    sql_insert = 'INSERT INTO `article_count_new`(Date,Count,LayoutNumber) values("{}",{},{})'
     for month in range(start_month, end_month + 1):
         url_list = get_count(year, month)
         create_sqlite_db()
@@ -104,7 +105,7 @@ def writeMonth(year, *args):
 
 
 def create_sqlite_db():
-    sql = 'CREATE TABLE if not exists `article_count`( `id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, `Date` ' \
+    sql = 'CREATE TABLE if not exists `article_count_new`( `id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, `Date` ' \
           'TEXT, `Count` INTEGER, `LayoutNumber` INTEGER)'
     # delete_sql = 'drop table {}'
     conn = sqlite3.connect(database_name)
@@ -126,4 +127,4 @@ def writeYear(year):
 
 if __name__ == '__main__':
     # writeYear(1993)
-    writeMonth(2000, 1, 12)
+    writeMonth(2020, 1, 6)

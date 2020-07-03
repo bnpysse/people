@@ -13,10 +13,10 @@ from pyquery import PyQuery as pq
 login_cookies_dict = {
     '_ga': 'GA1.2.576373095.1589077068',
     # 只需要改这个东东就可以，2020-06-11 17:14:42
-    'ezproxy': '3Cojg88u4rREqf1',
+    'ezproxy': '88p88V8m8y6koa1',
 }
 login_url = 'http://data.people.com.cn.proxy.library.georgetown.edu/rmrb/20200515/1?code=2'
-login_headers = {'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+login_headers = {'Accept': 'text/html,application/xhtml+xml,application3Cojg88u4rREqf1/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
                  'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu '
                                'Chromium/68.0.3440.106 Chrome/68.0.3440.106 Safari/537.36',
                  'Content-Type': 'text/html;charset=UTF-8', }
@@ -28,7 +28,7 @@ login_s.get(login_url, headers=login_headers, cookies=cookies)
 date_start = '1993-01-01'
 date_end = '2020-06-15'
 pageSize = 50
-database_name = 'words_frequency_ABC.db'
+database_name = 'words_frequency_AC.db'
 is_delete_last_words = True
 # region 查询串
 base_url = 'http://data.people.com.cn.proxy.library.georgetown.edu/rmrb/s?qs='
@@ -126,7 +126,7 @@ def get_last_words(table_name):
     conn = sqlite3.connect(database_name)
     conn.row_factory = sqlite3.Row
     cur = conn.cursor()
-    sql_get_last_rec = 'select * from `{}` order by ID desc limit 1;'
+    sql_get_last_rec = 'select * from `{}` order by rowid desc limit 1;'
     rec = cur.execute(sql_get_last_rec.format(table_name)).fetchone()
     if rec is None:
         cur.close()
@@ -227,8 +227,8 @@ def get_word_frequency(table_name, *args):
             print('Processing..{}，总计时间：{:2d}分{:2d}秒'.format('+'.join(my_words), minutes, secs))
         except StopIteration as e:
             print('Generator is done:', e.value)
-            minutes, secs = divmod((datetime.now() - start_time).seconds, 60)
-            print('总计用时:{:2d}分{:>3d}秒'.format(minutes, secs))
+            # minutes, secs = divmod((datetime.now() - start_time).seconds, 60)
+            # print('总计用时:{:2d}分{:>3d}秒'.format(minutes, secs))
             cursor.close()
             conn.close()
             break
@@ -281,4 +281,5 @@ if __name__ == '__main__':
     # 尤其是出错的情况下，再次读取时，默认状态下是删除最后一组词不完整的情况，执行后仍未获取到相关页面，
     # 这种情况下就需要在这里进行设置为 False,即不能再删除了。哈哈，2020-06-19 18:50:33
     is_delete_last_words = False
-    get_word_frequency('ABC', A, B, C)
+    database_name = 'words_frequency_AC.db'
+    get_word_frequency('AC', A, C)
