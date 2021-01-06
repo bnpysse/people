@@ -46,7 +46,7 @@ date_end = '2020-06-11'
 pageSize = 20
 database_name = 'words_frequency.db'
 base_url = 'http://data.people.com.cn.proxy.library.georgetown.edu/sc/ss?qs='
-base_url_tail = '&title=&title={}title=&dateTimeStart={}&dateTimeEndt={}&checkbox_sel=23&cIds='
+base_url_tail = '&title=&title={}title=&dateTimeStart={}&dateTimeEnd={}&checkbox_sel=23&cIds='
 
 # region 从 chrome 中获取的查询串
 qs = {"cIds": "23,", "cds": [

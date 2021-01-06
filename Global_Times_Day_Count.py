@@ -14,7 +14,7 @@ import calendar
 login_cookies_dict = {
     '_ga': 'GA1.2.1306172715.1609485446',
     # 只需要改这个东东就可以，2020-06-11 17:14:42
-    'ezproxy': 'ZmNzRKPReIW4gL4',
+    'ezproxy': 'nd5g0B5VdBqCJGf',
     # 这个 userid 和 pass, 应该是不用做任何改动，2020-01-02 14：10：45
     'pass': '11%2C101%2C103%2C104%2C105%2C107%2C114%2C129%2C',
     'userid': 'georgetownuc',
@@ -22,11 +22,11 @@ login_cookies_dict = {
 
 start_date = '1993.01.03'
 # 最大期号，对应的日期是 2021.01.04
-start_isssue_number = 1
+start_isssue_number = 526
 max_issue_number = 5256
 database_name = 'Global_Times.db'
 my_table_name = 'issue_count'
-pageSize = 5
+pageSize = 25
 
 # base_url = 'http://43.250.238.143.proxy.library.georgetown.edu/search?channelid=12900&searchword=%C8%D5%C6%DA%3d{}'
 # base_url = 'http://43.250.238.143.proxy.library.georgetown.edu/search'
@@ -66,14 +66,14 @@ def create_sqlite_db(table_name):
 
 
 def get_issue_count():
-    i, k = 1, 0
+    i, k = start_isssue_number, 0
     insert_sql = 'insert into `{}`(Date, IssueNumber, Count) values("{}",{},{})'
     conn = sqlite3.connect(database_name)
     cursor = conn.cursor()
     start_time = datetime.now()
     rec_dict = [dict() for k in range(pageSize)]
     while i <= max_issue_number:
-        response = login_s.get(base_url.format(i, i), headers=login_headers, cookies=cookies).content.decode('gbk')
+        response = login_s.get(base_url.format(i, i), headers=login_headers, cookies=cookies).content.decode('gb18030')
         doc = pq(response)
         # 要在 doc 中找到 script 脚本，其中有日期项目，其标识符为 [-12:-2]
         riqi = doc.find('script')[3].text.strip().split('\r\n')[2][-12:-2]
