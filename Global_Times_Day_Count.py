@@ -14,7 +14,7 @@ import calendar
 login_cookies_dict = {
     '_ga': 'GA1.2.1306172715.1609485446',
     # 只需要改这个东东就可以，2020-06-11 17:14:42
-    'ezproxy': 'nd5g0B5VdBqCJGf',
+    'ezproxy': '8efELFEP5NMk14z',
     # 这个 userid 和 pass, 应该是不用做任何改动，2020-01-02 14：10：45
     'pass': '11%2C101%2C103%2C104%2C105%2C107%2C114%2C129%2C',
     'userid': 'georgetownuc',
@@ -75,12 +75,19 @@ def get_issue_count():
     while i <= max_issue_number:
         response = login_s.get(base_url.format(i, i), headers=login_headers, cookies=cookies).content.decode('gb18030')
         doc = pq(response)
-        # 要在 doc 中找到 script 脚本，其中有日期项目，其标识符为 [-12:-2]
-        riqi = doc.find('script')[3].text.strip().split('\r\n')[2][-12:-2]
+
         count = int(doc('font').text())
-        rec_dict[k]['riqi'] = riqi
-        rec_dict[k]['issue_number'] = i
-        rec_dict[k]['count'] = count
+        if count == 0:
+            # 没有记录的情况
+            rec_dict[k]['riqi'] = '0000.00.00'
+            rec_dict[k]['count'] = 0
+            rec_dict[k]['issue_number'] = i
+        else:
+            # 要在 doc 中找到 script 脚本，其中有日期项目，其标识符为 [-12:-2]
+            riqi = doc.find('script')[3].text.strip().split('\r\n')[2][-12:-2]
+            rec_dict[k]['riqi'] = riqi
+            rec_dict[k]['issue_number'] = i
+            rec_dict[k]['count'] = count
         print(rec_dict[k]['riqi'], '--', rec_dict[k]['issue_number'], '--', rec_dict[k]['count'])
         if i % pageSize == 0:
             # 写入数据库中
