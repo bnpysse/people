@@ -14,7 +14,7 @@ import calendar
 login_cookies_dict = {
     '_ga': 'GA1.2.1306172715.1609485446',
     # 只需要改这个东东就可以，2020-06-11 17:14:42
-    'ezproxy': '8efELFEP5NMk14z',
+    'ezproxy': '1LDzE1D7IFMsMTP',
     # 这个 userid 和 pass, 应该是不用做任何改动，2020-01-02 14：10：45
     'pass': '11%2C101%2C103%2C104%2C105%2C107%2C114%2C129%2C',
     'userid': 'georgetownuc',
@@ -22,7 +22,7 @@ login_cookies_dict = {
 
 start_date = '1993.01.03'
 # 最大期号，对应的日期是 2021.01.04
-start_isssue_number = 526
+start_isssue_number = 4576
 max_issue_number = 5256
 database_name = 'Global_Times.db'
 my_table_name = 'issue_count'
